@@ -1,0 +1,627 @@
+// STEP 1: CREATE STAGE NODES
+CREATE (n0:Stage {
+    id: 0, 
+    term: 'NoLegalRelation', 
+    sense: 'No relevant legal relations exist', 
+    contractExists: false
+})
+
+CREATE (n1:Stage {
+    id: 1, 
+    term: 'OfferPending', 
+    sense: 'One or more offers are pending; the offeree has the power of accept', 
+    contractExists: false
+})
+
+CREATE (n2:Stage {
+    id: 2, 
+    term: 'ContractExists', 
+    sense: 'A contract exists', 
+    contractExists: true
+})
+
+CREATE (n12:Stage {
+    id: 12, 
+    term: 'ModificationPending', 
+    sense: 'A contract exists, and a proposal to modify it is pending', 
+    contractExists: true
+})
+
+
+// STEP 2: CREATE ARC NODES AND RELATIONSHIPS (INEFFECTIVE EVENTS REMOVED)
+CREATE (n0)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeror'
+}]->(t1:Arc {
+    term: 'Offer', 
+    by: 'Offeror', 
+    reference: 'Restatement (Second) of Contracts § 24', 
+    sense: 'An offer is the manifestation of willingness to enter into a bargain, so made as to justify another person in understanding that his assent to that bargain is invited and will conclude it.'
+})-[:TRANSITIONS_TO {
+    action: 'Offer', 
+    actor: 'Offeror'
+}]->(n1)
+
+// REMOVED: IneffectiveEvent1 (lines 45-55)
+
+CREATE (n1)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeree'
+}]->(t3:Arc {
+    term: 'Acceptance', 
+    by: 'Offeree', 
+    reference: 'Restatement (Second) of Contracts § 50(1)',
+    sense: 'Acceptance of an offer is a manifestation of assent to the terms thereof made by the offeree in a manner invited or required by the offer.'
+})-[:TRANSITIONS_TO {
+    action: 'Acceptance', 
+    actor: 'Offeree'
+}]->(n2)
+
+CREATE (n1)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeree'
+}]->(t4:Arc {
+    term: 'AcceptancePlusProposal', 
+    by: 'Offeree', 
+    sense: 'Accept with modification'
+})-[:TRANSITIONS_TO {
+    action: 'AcceptancePlusProposal', 
+    actor: 'Offeree'
+}]->(n12)
+
+CREATE (n1)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeree'
+}]->(t5:Arc {
+    term: 'Counteroffer', 
+    by: 'Offeree', 
+    sense: 'Counter proposed'
+})-[:TRANSITIONS_TO {
+    action: 'Counteroffer', 
+    actor: 'Offeree'
+}]->(n1)
+
+CREATE (n1)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeree'
+}]->(t6:Arc {
+    term: 'Rejection', 
+    by: 'Offeree', 
+    sense: 'Offer rejected'
+})-[:TRANSITIONS_TO {
+    action: 'Rejection', 
+    actor: 'Offeree'
+}]->(n0)
+
+CREATE (n1)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeror'
+}]->(t7:Arc {
+    term: 'Revocation', 
+    by: 'Offeror', 
+    sense: 'Offer withdrawn'
+})-[:TRANSITIONS_TO {
+    action: 'Revocation', 
+    actor: 'Offeror'
+}]->(n0)
+
+CREATE (n1)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeror'
+}]->(t8:Arc {
+    term: 'Modification', 
+    by: 'Offeror', 
+    sense: 'Offer modified'
+})-[:TRANSITIONS_TO {
+    action: 'Modification', 
+    actor: 'Offeror'
+}]->(n1)
+
+CREATE (n1)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Party'
+}]->(t9:Arc {
+    term: 'Death1', 
+    by: 'Party', 
+    sense: 'Party deceased'
+})-[:TRANSITIONS_TO {
+    action: 'Death1', 
+    actor: 'Party'
+}]->(n0)
+
+// REMOVED: IneffectiveEvent2 (lines 142-152)
+
+CREATE (n2)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Party'
+}]->(t11:Arc {
+    term: 'ProposalToModify', 
+    by: 'Party', 
+    sense: 'Modification proposed'
+})-[:TRANSITIONS_TO {
+    action: 'ProposalToModify', 
+    actor: 'Party'
+}]->(n12)
+
+CREATE (n2)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeree'
+}]->(t12:Arc {
+    term: 'RejectionRevokingAcceptance', 
+    by: 'Offeree', 
+    sense: 'Acceptance revoked'
+})-[:TRANSITIONS_TO {
+    action: 'RejectionRevokingAcceptance', 
+    actor: 'Offeree'
+}]->(n0)
+
+// REMOVED: IneffectiveEvent3 (lines 178-188)
+
+CREATE (n12)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Counterparty'
+}]->(t14:Arc {
+    term: 'AcceptanceOfModification', 
+    by: 'Counterparty', 
+    sense: 'Modification accepted'
+})-[:TRANSITIONS_TO {
+    action: 'AcceptanceOfModification', 
+    actor: 'Counterparty'
+}]->(n2)
+
+CREATE (n12)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Counterparty'
+}]->(t15:Arc {
+    term: 'AcceptanceOfModificationPlusProposal', 
+    by: 'Counterparty', 
+    sense: 'Accept with new proposal'
+})-[:TRANSITIONS_TO {
+    action: 'AcceptanceOfModificationPlusProposal', 
+    actor: 'Counterparty'
+}]->(n12)
+
+CREATE (n12)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Counterparty'
+}]->(t16:Arc {
+    term: 'CounterofferToModification', 
+    by: 'Counterparty', 
+    sense: 'Counter modification'
+})-[:TRANSITIONS_TO {
+    action: 'CounterofferToModification', 
+    actor: 'Counterparty'
+}]->(n12)
+
+CREATE (n12)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Counterparty'
+}]->(t17:Arc {
+    term: 'RejectionOfModification', 
+    by: 'Counterparty', 
+    sense: 'Modification rejected'
+})-[:TRANSITIONS_TO {
+    action: 'RejectionOfModification', 
+    actor: 'Counterparty'
+}]->(n2)
+
+CREATE (n12)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Offeree'
+}]->(t18:Arc {
+    term: 'RejectionRevokingAcceptanceAndModification', 
+    by: 'Offeree', 
+    sense: 'Full revocation'
+})-[:TRANSITIONS_TO {
+    action: 'RejectionRevokingAcceptanceAndModification', 
+    actor: 'Offeree'
+}]->(n0)
+
+CREATE (n12)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Party'
+}]->(t19:Arc {
+    term: 'RevocationOfModification', 
+    by: 'Party', 
+    sense: 'Modification withdrawn'
+})-[:TRANSITIONS_TO {
+    action: 'RevocationOfModification', 
+    actor: 'Party'
+}]->(n2)
+
+CREATE (n12)-[:TRANSITIONS_TO {
+    action: 'initiates', 
+    actor: 'Party'
+}]->(t20:Arc {
+    term: 'Death2', 
+    by: 'Party', 
+    sense: 'Party deceased'
+})-[:TRANSITIONS_TO {
+    action: 'Death2', 
+    actor: 'Party'
+}]->(n2)
+
+// REMOVED: IneffectiveEvent4 (lines 274-284)
+
+
+// CREATE ANTECEDENTS FOR "OFFER"
+// Primary Antecedents (1-3) with label :OfferAntecedent
+CREATE (a1:OfferAntecedent {
+    by: 'Offeror', 
+    term: 'OfferManifestation', 
+    reference: 'Restatement (Second) of Contracts § 24', 
+    sense: 'An offer is the manifestation of willingness to enter into a bargain, so made as to justify another person in understanding that his assent to that bargain is invited and will conclude it.'
+})
+
+CREATE (a2:OfferAntecedent {
+    by: 'Offeror', 
+    term: 'Willingness/Bargain', 
+    reference: 'Restatement (Second) of Contracts § 24', 
+    sense: 'An offer is the manifestation of willingness to enter into a bargain, so made as to justify another person in understanding that his assent to that bargain is invited and will conclude it.'
+})
+
+CREATE (a3:OfferAntecedent {
+    by: 'Offeror', 
+    term: 'Understanding/Perception', 
+    reference: 'Restatement (Second) of Contracts § 24', 
+    sense: 'An offer is the manifestation of willingness to enter into a bargain, so made as to justify another person in understanding that his assent to that bargain is invited and will conclude it.'
+})
+
+// Sub-antecedents for Manifestation (three-part)
+CREATE (a1a:OfferAntecedent:ManifestationAntecedent {
+    by: 'Offeror', 
+    term: 'Act by Offeror', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The prospective offeror performs some act.'
+})
+
+CREATE (a1b:OfferAntecedent:ManifestationAntecedent {
+    by: 'Offeror', 
+    term: 'Addressed To Offeree', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The act is addressed to the prospective offeree.'
+})
+
+CREATE (a1c:OfferAntecedent:ManifestationAntecedent {
+    by: 'Offeror', 
+    term: 'Content (Sentences)', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The act has content (utterances and sentences).'
+})
+
+// Sub-antecedent for Act (one-part for now)
+CREATE (a1aa:OfferAntecedent:ManifestationAntecedent:ActAntecedent {
+    by: 'Offeror', 
+    term: 'Speech Act', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The act is a speech act (telegram, letter, oral communication, etc.).'
+})
+
+// Sub-antecedents for Willingness/Bargain (four-part)
+CREATE (a2a:OfferAntecedent:BargainAntecedent {
+    by: 'Offeror', 
+    term: 'About Exchange', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The willingness is about an exchange.'
+})
+
+CREATE (a2b:OfferAntecedent:BargainAntecedent {
+    by: 'Offeror', 
+    term: 'Certain Terms', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The exchange involves certain terms.'
+})
+
+CREATE (a2c:OfferAntecedent:BargainAntecedent {
+    by: 'Offeror', 
+    term: 'Willingness to be Bound', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The prospective offeror is willing to be bound.'
+})
+
+CREATE (a2d:OfferAntecedent:BargainAntecedent {
+    by: 'Offeror', 
+    term: 'Offeror=Party', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The prospective offeror is a party to the exchange.'
+})
+
+// Sub-antecedents for Understanding/Perception (two-part)
+CREATE (a3a:OfferAntecedent:PerceptionAntecedent {
+    by: 'Offeror', 
+    term: 'Assent Invited', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The prospective offeror invites assent.'
+})
+
+CREATE (a3b:OfferAntecedent:PerceptionAntecedent {
+    by: 'Offeror', 
+    term: 'Conclusiveness', 
+    reference: 'Gardner, 1984. An Artificial Intelligence Approach to Legal Reasoning.', 
+    sense: 'The prospective offeror is apparently ready to be bound to a contract for the exchange, without doing anything more.'
+});
+
+// Create relationships with logical AND dependencies
+// Match the offer node
+MATCH (offer:Arc {term: 'Offer'})
+// Match all the main antecedents
+MATCH (a1:OfferAntecedent {term: 'OfferManifestation'})
+MATCH (a2:OfferAntecedent {term: 'Willingness/Bargain'})
+MATCH (a3:OfferAntecedent {term: 'Understanding/Perception'})
+// Connect main antecedents to Offer
+CREATE (offer)-[:REQUIRES {logic: 'AND', required: true}]->(a1)
+CREATE (offer)-[:REQUIRES {logic: 'AND', required: true}]->(a2)
+CREATE (offer)-[:REQUIRES {logic: 'AND', required: true}]->(a3);
+
+// Match and connect Manifestation sub-antecedents
+MATCH (a1:OfferAntecedent {term: 'OfferManifestation'})
+MATCH (a1a:ManifestationAntecedent {term: 'Act by Offeror'})
+MATCH (a1b:ManifestationAntecedent {term: 'Addressed To Offeree'})
+MATCH (a1c:ManifestationAntecedent {term: 'Content (Sentences)'})
+CREATE (a1)-[:REQUIRES {logic: 'AND', required: true}]->(a1a)
+CREATE (a1)-[:REQUIRES {logic: 'AND', required: true}]->(a1b)
+CREATE (a1)-[:REQUIRES {logic: 'AND', required: true}]->(a1c);
+
+// Match and connect Act sub-antecedent
+MATCH (a1a:ManifestationAntecedent {term: 'Act by Offeror'})
+MATCH (a1aa:ActAntecedent {term: 'Speech Act'})
+CREATE (a1a)-[:REQUIRES {logic: 'AND', required: true}]->(a1aa);
+
+// Match and connect Bargain sub-antecedents
+MATCH (a2:OfferAntecedent {term: 'Willingness/Bargain'})
+MATCH (a2a:BargainAntecedent {term: 'About Exchange'})
+MATCH (a2b:BargainAntecedent {term: 'Certain Terms'})
+MATCH (a2c:BargainAntecedent {term: 'Willingness to be Bound'})
+MATCH (a2d:BargainAntecedent {term: 'Offeror=Party'})
+CREATE (a2)-[:REQUIRES {logic: 'AND', required: true}]->(a2a)
+CREATE (a2)-[:REQUIRES {logic: 'AND', required: true}]->(a2b)
+CREATE (a2)-[:REQUIRES {logic: 'AND', required: true}]->(a2c)
+CREATE (a2)-[:REQUIRES {logic: 'AND', required: true}]->(a2d);
+
+// Match and connect Perception sub-antecedents
+MATCH (a3:OfferAntecedent {term: 'Understanding/Perception'})
+MATCH (a3a:PerceptionAntecedent {term: 'Assent Invited'})
+MATCH (a3b:PerceptionAntecedent {term: 'Conclusiveness'})
+CREATE (a3)-[:REQUIRES {logic: 'AND', required: true}]->(a3a)
+CREATE (a3)-[:REQUIRES {logic: 'AND', required: true}]->(a3b);
+
+// CREATE ANTECEDENTS FOR "ACCEPTANCE"
+// Primary Antecedents (1-2) with label :InterimStep
+CREATE (a1:InterimStep {
+    by: 'Offeree', 
+    term: 'GeneralRequirements', 
+    reference: 'ZH', 
+    sense: 'Required for any and all acceptances'
+}) 
+
+CREATE (a2:InterimStep {
+    by: 'Offeree', 
+    term: 'SpecificRequirements', 
+    reference: 'ZH', 
+    sense: 'Required only for specific acceptances'
+});
+
+// CREATE SUB-ANTECEDENTS FOR GeneralRequirements
+CREATE (a1a:AcceptanceAntecedent:GeneralRequirements {
+    by: 'Offeree', 
+    term: 'AcceptanceManifestation', 
+    reference: 'Restatement (Second) of Contracts § 50(1)', 
+    sense: 'Acceptance of an offer is a manifestation of assent to the terms thereof made by the offeree in a manner invited or required by the offer.'
+})
+
+CREATE (a1b:AcceptanceAntecedent:GeneralRequirements {
+    by: 'Offeree', 
+    term: 'Assent to Terms', 
+    reference: 'Restatement (Second) of Contracts § 50(1)', 
+    sense: 'Acceptance of an offer is a manifestation of assent to the terms thereof made by the offeree in a manner invited or required by the offer.'
+})
+
+CREATE (a1c:AcceptanceAntecedent:GeneralRequirements {
+    by: 'Offeree', 
+    term: 'Appropriate Manner', 
+    reference: 'Restatement (Second) of Contracts § 50(1)', 
+    sense: 'Acceptance of an offer is a manifestation of assent to the terms thereof made by the offeree in a manner invited or required by the offer.'
+});
+
+// CREATE SUB-ANTECEDENTS FOR "APPROPRIATE MANNER"
+CREATE (a1ca:AcceptanceAntecedent:GeneralRequirements:MannerAntecedent {
+    by: 'Offeree', 
+    term: 'Invited by Offer', 
+    reference: 'Restatement (Second) of Contracts § 50(1)', 
+    sense: 'Acceptance of an offer is a manifestation of assent to the terms thereof made by the offeree in a manner invited or required by the offer.'
+})
+
+CREATE (a1cb:AcceptanceAntecedent:GeneralRequirements:MannerAntecedent {
+    by: 'Offeree', 
+    term: 'Required by Offer', 
+    reference: 'Restatement (Second) of Contracts § 50(1)', 
+    sense: 'Acceptance of an offer is a manifestation of assent to the terms thereof made by the offeree in a manner invited or required by the offer.'
+});
+
+// CREATE SUB-ANTECEDENTS FOR SpecificRequirements
+CREATE (a2a:AcceptanceAntecedent:SpecificRequirements:PerformanceAntecedent {
+    by: 'Offeree', 
+    term: 'Acceptance by Performance', 
+    reference: 'Restatement (Second) of Contracts § 50(2)', 
+    sense: 'Acceptance by performance requires that at least part of what the offer requests be performed or tendered and includes acceptance by a performance which operates as a return promise.'
+})
+
+CREATE (a2b:AcceptanceAntecedent:SpecificRequirements:PromiseAntecedent {
+    by: 'Offeree', 
+    term: 'Acceptance by Promise', 
+    reference: 'Restatement (Second) of Contracts § 50(3)', 
+    sense: 'Acceptance by a promise requires that the offeree complete every act essential to the making of the promise.'
+})
+
+CREATE (a2c:AcceptanceAntecedent:SpecificRequirements:SilenceAntecedent {
+    by: 'Offeree', 
+    term: 'Acceptance by Silence', 
+    reference: 'Restatement (Second) of Contracts § 69', 
+    sense: 'Where an offeree fails to reply to an offer, his silence and inaction operate as an acceptance in the following cases only […]'
+});
+
+// CREATE SUB-ANTECEDENTS FOR AcceptanceByPerformance
+CREATE (a2aa:AcceptanceAntecedent:SpecificRequirements:PerformanceAntecedent {
+    by: 'Offeree', 
+    term: 'Performance Requirements', 
+    reference: 'Restatement (Second) of Contracts § 50(2)', 
+    sense: 'Additional requirements for acceptance by performance (e.g., partial performance, invitation to perform, notice requirements)'
+});
+
+// CREATE SUB-ANTECEDENTS FOR AcceptanceByPromise
+CREATE (a2ba:AcceptanceAntecedent:SpecificRequirements:PromiseAntecedent {
+    by: 'Offeree', 
+    term: 'Promise Requirements', 
+    reference: 'Restatement (Second) of Contracts § 50(3)', 
+    sense: 'Additional requirements for acceptance by promise (e.g., completion of all essential acts, proper communication)'
+});
+
+// CREATE SUB-ANTECEDENTS FOR AcceptanceBySilence
+CREATE (a2ca:AcceptanceAntecedent:SpecificRequirements:SilenceAntecedent {
+    by: 'Offeree', 
+    term: 'Benefit Taken', 
+    reference: 'Restatement (Second) of Contracts § 69(1)(a)', 
+    sense: 'Offeree takes the benefit of offered services with reasonable opportunity to reject them and reason to know that they were offered with the expectation of compensation'
+})
+
+CREATE (a2cb:AcceptanceAntecedent:SpecificRequirements:SilenceAntecedent {
+    by: 'Offeror', 
+    term: 'Silence Equals Assent', 
+    reference: 'Restatement (Second) of Contracts § 69(1)(b)', 
+    sense: 'The offeror has stated or given the offeree reason to understand that assent may be manifested by silence or inaction'
+})
+
+CREATE (a2cc:AcceptanceAntecedent:SpecificRequirements:SilenceAntecedent {
+    by: 'Offeree', 
+    term: 'Reasonable to Notify', 
+    reference: 'Restatement (Second) of Contracts § 69(1)(c)', 
+    sense: 'Where because of previous dealings or otherwise, it is reasonable that the offeree should notify the offeror if he does not intend to accept' 
+});
+
+// CREATE SUB-ANTECEDENTS FOR Reasonable to Notify
+CREATE (a2cca:AcceptanceAntecedent:SpecificRequirements:SilenceAntecedent:ReasonableAntecedent {
+    by: 'Parties', 
+    term: 'Previous Dealings Exist', 
+    reference: 'Restatement (Second) of Contracts § 69(1)(c)', 
+    sense: 'Have the parties had previous dealings?'
+})
+
+CREATE (a2ccb:AcceptanceAntecedent:SpecificRequirements:SilenceAntecedent:ReasonableAntecedent {
+    by: 'Offeree', 
+    term: 'Reasonable Due to Previous Dealings', 
+    reference: 'Restatement (Second) of Contracts § 69(1)(c)', 
+    sense: 'Is it reasonable, because of previous dealings, that the offeree should notify the offeror if they do not intend to accept?'
+})
+
+CREATE (a2ccc:AcceptanceAntecedent:SpecificRequirements:SilenceAntecedent:ReasonableAntecedent {
+    by: 'Offeree', 
+    term: 'Otherwise Reasonable', 
+    reference: 'Restatement (Second) of Contracts § 69(1)(c)', 
+    sense: 'Is it otherwise reasonable (due to circumstances other than previous dealings) that the offeree should notify the offeror if they do not intend to accept?'
+});
+
+// CREATE ANTECEDENTS FOR "COUNTEROFFER"
+// Primary Antecedents (1-2) with label :CounterofferAntecedent
+CREATE (a1:CounterofferAntecedent {
+    by: 'Offeree', 
+    term: 'Same matter', 
+    reference: 'Restatement (Second) of Contracts § 39(1)', 
+    sense: 'A counter-offer is an offer made by an offeree to his offeror relating to the same matter as the original offer and proposing a substituted bargain differing from that proposed by the original offer.'
+})
+CREATE (a2:CounterofferAntecedent {
+    by: 'Offeree', 
+    term: 'Different Bargain', 
+    reference: 'Restatement (Second) of Contracts § 39(1)', 
+    sense: 'A counter-offer is an offer made by an offeree to his offeror relating to the same matter as the original offer and proposing a substituted bargain differing from that proposed by the original offer.'   
+});
+
+// CREATE RELATIONSHIPS WITH LOGICAL DEPENDENCIES
+
+// Connect Counteroffer antecedents to Counteroffer Arc
+MATCH (counteroffer:Arc {term: 'Counteroffer'})
+MATCH (a1:CounterofferAntecedent {term: 'Same matter'})
+MATCH (a2:CounterofferAntecedent {term: 'Different Bargain'})
+CREATE (counteroffer)-[:REQUIRES {logic: 'AND', required: true}]->(a1)
+CREATE (counteroffer)-[:REQUIRES {logic: 'AND', required: true}]->(a2);
+
+// Match the acceptance node and primary antecedents
+MATCH (acceptance:Arc {term: 'Acceptance'})
+MATCH (a1:InterimStep {term: 'GeneralRequirements'})
+MATCH (a2:InterimStep {term: 'SpecificRequirements'})
+
+// Acceptance requires BOTH General AND Specific Requirements
+CREATE (acceptance)-[:REQUIRES {logic: 'AND', required: true}]->(a1)
+CREATE (acceptance)-[:REQUIRES {logic: 'AND', required: true}]->(a2);
+
+// General Requirements - ALL are required (AND)
+MATCH (a1:InterimStep {term: 'GeneralRequirements'})
+MATCH (a1a:AcceptanceAntecedent:GeneralRequirements {term: 'AcceptanceManifestation'})
+MATCH (a1b:AcceptanceAntecedent:GeneralRequirements {term: 'Assent to Terms'})
+MATCH (a1c:AcceptanceAntecedent:GeneralRequirements {term: 'Appropriate Manner'})
+
+CREATE (a1)-[:REQUIRES {logic: 'AND', required: true}]->(a1a)
+CREATE (a1)-[:REQUIRES {logic: 'AND', required: true}]->(a1b)
+CREATE (a1)-[:REQUIRES {logic: 'AND', required: true}]->(a1c);
+
+// Appropriate Manner - EITHER invited OR required (OR)
+MATCH (a1c:AcceptanceAntecedent:GeneralRequirements {term: 'Appropriate Manner'})
+MATCH (a1ca:MannerAntecedent {term: 'Invited by Offer'})
+MATCH (a1cb:MannerAntecedent {term: 'Required by Offer'})
+
+CREATE (a1c)-[:REQUIRES {logic: 'OR', required: true}]->(a1ca)
+CREATE (a1c)-[:REQUIRES {logic: 'OR', required: true}]->(a1cb);
+
+// Specific Requirements - ONE OF (OR)
+MATCH (a2:InterimStep {term: 'SpecificRequirements'})
+MATCH (a2a:PerformanceAntecedent {term: 'Acceptance by Performance'})
+MATCH (a2b:PromiseAntecedent {term: 'Acceptance by Promise'})
+MATCH (a2c:SilenceAntecedent {term: 'Acceptance by Silence'})
+
+CREATE (a2)-[:REQUIRES {logic: 'OR', required: true}]->(a2a)
+CREATE (a2)-[:REQUIRES {logic: 'OR', required: true}]->(a2b)
+CREATE (a2)-[:REQUIRES {logic: 'OR', required: true}]->(a2c);
+
+// Performance Requirements - placeholder child node
+MATCH (a2a:PerformanceAntecedent {term: 'Acceptance by Performance'})
+MATCH (a2aa:PerformanceAntecedent {term: 'Performance Requirements'})
+
+CREATE (a2a)-[:REQUIRES {logic: 'AND', required: true}]->(a2aa);
+
+// Promise Requirements - placeholder child node
+MATCH (a2b:PromiseAntecedent {term: 'Acceptance by Promise'})
+MATCH (a2ba:PromiseAntecedent {term: 'Promise Requirements'})
+
+CREATE (a2b)-[:REQUIRES {logic: 'AND', required: true}]->(a2ba);
+
+// Silence Requirements - ONE OF (OR)
+MATCH (a2c:SilenceAntecedent {term: 'Acceptance by Silence'})
+MATCH (a2ca:SilenceAntecedent {term: 'Benefit Taken'})
+MATCH (a2cb:SilenceAntecedent {term: 'Silence Equals Assent'})
+MATCH (a2cc:SilenceAntecedent {term: 'Reasonable to Notify'})
+
+CREATE (a2c)-[:REQUIRES {logic: 'OR', required: true}]->(a2ca)
+CREATE (a2c)-[:REQUIRES {logic: 'OR', required: true}]->(a2cb)
+CREATE (a2c)-[:REQUIRES {logic: 'OR', required: true}]->(a2cc);
+
+// Reasonable to Notify - Complex logic
+MATCH (a2cc:SilenceAntecedent {term: 'Reasonable to Notify'})
+MATCH (a2cca:ReasonableAntecedent {term: 'Previous Dealings Exist'})
+MATCH (a2ccb:ReasonableAntecedent {term: 'Reasonable Due to Previous Dealings'})
+MATCH (a2ccc:ReasonableAntecedent {term: 'Otherwise Reasonable'})
+
+// Create intermediate node for previous dealings logic
+CREATE (prevDealingsLogic:InterimStep {
+    by: 'System',
+    term: 'Previous Dealings Logic',
+    reference: 'Restatement (Second) of Contracts § 69(1)(c)',
+    sense: 'If previous dealings exist, then it must be reasonable based on those dealings',
+    type: 'conditional'
+})
+
+// Connect the logic
+CREATE (a2cc)-[:REQUIRES {logic: 'OR', required: true}]->(prevDealingsLogic)
+CREATE (a2cc)-[:REQUIRES {logic: 'OR', required: true}]->(a2ccc)
+
+// Previous dealings logic requires BOTH existence AND reasonableness
+CREATE (prevDealingsLogic)-[:REQUIRES {logic: 'AND', required: true}]->(a2cca)
+CREATE (prevDealingsLogic)-[:REQUIRES {logic: 'AND', required: true}]->(a2ccb);
